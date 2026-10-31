@@ -27,7 +27,7 @@ from cli_anything.photoshop.utils.photoshop_backend import PhotoshopError
 from cli_anything.photoshop.utils.repl_skin import ReplSkin
 
 SOFTWARE = "photoshop"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 
 class Obj(dict):

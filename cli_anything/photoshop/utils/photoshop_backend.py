@@ -24,6 +24,7 @@ from __future__ import annotations
 import glob
 import os
 import subprocess
+import sys
 import tempfile
 
 __all__ = [
@@ -67,9 +68,18 @@ def _binary_paths() -> list[str]:
 def find_photoshop() -> str:
     """Return the application *name* (no ``.app``) used for AppleScript ``tell``.
 
+    macOS only: the transport is AppleScript, which does not exist elsewhere,
+    so this fails with a platform message rather than a bogus "not installed".
     Override target discovery with ``CLI_ANYTHING_PHOTOSHOP_APP`` (either a
     full ``*.app`` path or an application name).
     """
+    if sys.platform != "darwin":
+        raise PhotoshopError(
+            "cli-anything-photoshop requires macOS (detected: "
+            f"{sys.platform}).\n"
+            "It drives Photoshop through AppleScript / ExtendScript, which "
+            "only exists on macOS — there is no Linux or Windows backend."
+        )
     override = os.environ.get("CLI_ANYTHING_PHOTOSHOP_APP", "").strip()
     if override:
         return os.path.basename(override.removesuffix(".app"))

@@ -78,6 +78,17 @@ def test_find_photoshop_real_install(monkeypatch):
     assert name.startswith("Adobe Photoshop")
 
 
+def test_find_photoshop_rejects_non_macos(monkeypatch):
+    # AppleScript only exists on macOS, so other platforms must say *that*
+    # rather than the misleading "Photoshop not found in /Applications".
+    monkeypatch.setattr(backend.sys, "platform", "linux")
+    with pytest.raises(backend.PhotoshopError) as excinfo:
+        backend.find_photoshop()
+    message = str(excinfo.value)
+    assert "requires macOS" in message
+    assert "/Applications" not in message
+
+
 # ── session state (locked writes) ─────────────────────────────────────────
 def test_session_roundtrip(tmp_path):
     path = str(tmp_path / "session.json")

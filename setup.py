@@ -2,7 +2,7 @@ from setuptools import find_namespace_packages, setup
 
 setup(
     name="cli-anything-photoshop",
-    version="1.0.0",
+    version="1.0.1",
     description=(
         "A stateful CLI harness for Adobe Photoshop — control the running app "
         "programmatically via AppleScript/ExtendScript."
