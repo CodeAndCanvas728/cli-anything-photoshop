@@ -36,6 +36,18 @@ JavaScript` bridge); nothing is reimplemented in Python.
   Photoshop busy).
 - TIFF export is not offered (engine limitation); equalize() is not exposed
   (verified failure) — posterize/threshold take `--amount`.
+- `doc resize-image` **fails on Photoshop 27.10** with every argument form
+  (`--width`, `--height`; both together is refused by the CLI): Photoshop
+  answers `Illegal argument - argument 3, Numeric value expected`. Do not
+  retry variants. To get an exact pixel size, set it before Photoshop sees the
+  file: it opens an SVG at 300 dpi, so an SVG with root `width="1280"` exports
+  at 5333 px. Render from a copy whose root `width`/`height` are scaled by
+  72/300 (307.2 x 153.6 gives exactly 1280 x 640), editing only the root
+  `<svg>` line. Then `export convert in.svg out.png --overwrite`.
+  *Verified 2026-11-03:* 1280 x 640 PNG from a scaled copy; the three
+  `resize-image` forms each failed. Photoshop's PNG export is also
+  uncompressed-heavy (2.4 MB for a flat 1280 x 640 card): recompress it with
+  `vert convert in.png -t png -q medium -o out.png` (23 KB, no visible change).
 
 ## Command groups (all support `--json`; context before subcommand)
 
@@ -51,7 +63,7 @@ cli-anything-photoshop doc new --width 1920 --height 1080 \
    [--fill white|transparent|background] [--bits 8|16|32]
 cli-anything-photoshop --doc "CLI" doc info
 cli-anything-photoshop --doc "CLI" doc flatten
-cli-anything-photoshop --doc "CLI" doc resize-image --width 512         # one of --width/--height → proportional
+cli-anything-photoshop --doc "CLI" doc resize-image --width 512         # BROKEN on PS 27.10, see Key rules
 cli-anything-photoshop --doc "CLI" doc resize-canvas --width 100 --height 80
 cli-anything-photoshop --doc "CLI" doc rotate --degrees 90            # 90|-90|180
 cli-anything-photoshop --doc "CLI" doc flip --axis vertical
